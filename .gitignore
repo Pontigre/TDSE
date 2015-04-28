@@ -1,0 +1,13 @@
+*.o
+*.mod
+*.f90~
+*.out
+myprog
+*.txt
+*.gnu~
+Makefile~
+*.log
+*.aux
+*.gz
+*.toc
+*.png

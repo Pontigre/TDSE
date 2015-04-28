@@ -9,7 +9,7 @@ COMPILE = $(FC) $(FFLAGS)
 LINK = $(FC) $(LDFLAGS)
 
 OBJS =
-OBJS += plot.o
+#OBJS += plot.o
 OBJS += initialization.o
 OBJS += time_evolution.o
 OBJS += myprog.o

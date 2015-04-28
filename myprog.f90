@@ -1,33 +1,35 @@
 program TDSE
 
   use initialization
-!  use time_evolution
-  use plplot
+  use time_evolution
+!  use plot
 
   implicit none
-  integer :: sys=1 ! can change later for different systems. (1 = barrier, 2 = hole, 3 = single slit, 4 = double slit, 5 = ball)
+  integer :: sys=1 ! can change later for different systems. (1 = barrier, 2 = hole, 3 = single slit, 4 = double slit)
   integer :: meth=1 ! change later for different calc methods (1= RK4, 2 = Euler)
   integer, parameter :: N=30 !number of bins
   complex(8) :: psi(N)
   real(8) :: pot(N)
-!  real(8) :: t, timestep=0.01, t_final, t_init
+  real(8) :: t, timestep=0.01, t_final=1, t_init=0.1
   integer :: i
 
 
   call init_random_seed()
   call init_psi(N,psi,sys)
   call init_sys(N,pot,sys)
-
-do i = 1, N
-write(*,*) psi(i)
-end do
-
-!!$  t = t_init
-!!$  do while (t<t_final)
-!!$     call time_evo(N,meth,psi,t,timestep)
-!!$     t=t+timestep
-!!$  end do
-
+  open(unit = 16, file="asdf.txt")
+  open(unit = 17, file="asdf2.txt")
+  t = t_init
+  do i = 1, N
+     write(16,*) i, CDABS(psi(i))**2
+  end do
+  do while (t<t_final)
+     call time_evo(N,meth,psi,pot,t,timestep)
+     t=t+timestep
+  end do
+  do i = 1, N
+     write(17,*) i, CDABS(psi(i))**2
+  end do
 end program TDSE
 
 subroutine init_random_seed()

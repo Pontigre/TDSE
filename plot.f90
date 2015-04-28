@@ -25,7 +25,7 @@ module plot
 
 contains
 
-  subroutine linspace(x1, x2, n, x)
+  subroutine linspace(x1, x2, n, x)  !sets up the linearly spaced array
 
     real(8), intent(in) :: x1, x2
     integer, intent(in) :: n
@@ -43,7 +43,7 @@ contains
   end subroutine linspace
 
 
-  subroutine plot_x2(x1, x2, n)
+  subroutine plot_x2(x1, x2, n) !plots function
 
     real(8), intent(in) :: x1, x2
     integer, intent(in) :: n

@@ -1,5 +1,5 @@
-FC = gfortran
-FFLAGS = -Wall -Wextra -O3 -march=native -ffast-math #-std=f95
+FC = gfortran-4.6
+FFLAGS = -Wall -Wextra -O3 -march=native -ffast-math -std=f95 -fall-intrinsics
 LDFLAGS =
 
 FFLAGS += $(shell pkg-config --cflags plplotd-f95)
@@ -9,7 +9,7 @@ COMPILE = $(FC) $(FFLAGS)
 LINK = $(FC) $(LDFLAGS)
 
 OBJS =
-#OBJS += plot.o
+OBJS += plot.o
 OBJS += initialization.o
 OBJS += time_evolution.o
 OBJS += myprog.o

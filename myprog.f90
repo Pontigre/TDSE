@@ -2,77 +2,39 @@ program TDSE
 
   use initialization
   use time_evolution
-!  use plot
+  use plot
+  use plplot
 
   implicit none
-  integer :: sys=1 ! can change later for different systems. (1 = barrier, 2 = hole, 3 = single slit, 4 = double slit)
-  integer :: meth=1 ! change later for different calc methods (1= RK4, 2 = Euler)
-  integer, parameter :: N=30 !number of bins
-  complex(8) :: psi(N)
-  real(8) :: pot(N)
-  real(8) :: t, timestep=0.01, t_final=1, t_init=0.1
-  integer :: i
 
+  integer :: sys=1
+  integer :: meth=2 
+  integer, parameter :: N=75
+  complex(8) :: psi(N), psi2(N,N)
+  real(8) :: pot(N), pot2(N,N)
+  real(8) :: t, dt=0.02, t_final=30d0, t_init=0d0
 
-  call init_random_seed()
-  call init_psi(N,psi,sys)
-  call init_sys(N,pot,sys)
-  open(unit = 16, file="asdf.txt")
-  open(unit = 17, file="asdf2.txt")
   t = t_init
-  do i = 1, N
-     write(16,*) i, CDABS(psi(i))**2
-  end do
+  call init_psi(N,psi,psi2,sys)
+  call init_sys(N,pot,pot2,sys)
+
+  if (sys == 1) then
+  call plot_init(N)
   do while (t<t_final)
-     call time_evo(N,meth,psi,pot,t,timestep)
-     t=t+timestep
+     call time_evo_1D(N,meth,psi,pot,dt)
+     call plot_1D(N, psi, pot)
+     t=t+dt
   end do
-  do i = 1, N
-     write(17,*) i, CDABS(psi(i))**2
+else
+  call plot_init_2D(N)
+
+  do while (t<t_final)
+     call time_evo_2D(N,meth,psi2,pot2,dt)
+     call plot_2D(N,psi2,pot2)
+     t = t+dt
   end do
+
+end if
+call plot_close()
+
 end program TDSE
-
-subroutine init_random_seed()
-  implicit none
-
-  integer, allocatable :: seed(:)
-  integer :: i, n, istat, dt(8), pid, t(2), s
-  integer(8) :: count, tms
-  call random_seed(size = n)
-  allocate(seed(n))
-  open(unit=30, file="/dev/urandom", access="stream",&
-       form="unformatted", action="read", status="old", &
-       iostat=istat)
-  if (istat == 0) then
-     read(30) seed
-     close(30)
-  else
-     call system_clock(count)
-     if (count /= 0) then
-        t = transfer(count, t)
-     else
-        call date_and_time(values=dt)
-        tms = (dt(1) - 1970)*365_8 * 24 * 60 * 60 * 1000 &
-             + dt(2) * 31_8 * 24 * 60 * 60 * 1000 &
-             + dt(3) * 24 * 60 * 60 * 60 * 1000 &
-             + dt(5) * 60 * 60 * 1000 &
-             + dt(6) * 60 * 1000 + dt(7) * 1000 &
-             + dt(8)
-        t = transfer(tms, t)
-     end if
-     s = ieor(t(1), t(2))
-     pid = getpid() + 1099279 ! Add a prime
-     s = ieor(s, pid)
-     if (n >= 3) then
-        seed(1) = t(1) + 36269
-        seed(2) = t(2) + 72551
-        seed(3) = pid
-        if (n > 3) then
-           seed(4:) = s + 37 * (/ (i, i = 0, n - 4) /)
-        end if
-     else
-        seed = s + 37 * (/ (i, i = 0, n - 1 ) /)
-     end if
-  end if
-  call random_seed(put=seed)
-end subroutine init_random_seed

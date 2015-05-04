@@ -2,54 +2,99 @@ module time_evolution
 
   implicit none
 
-  public time_evo
+  public time_evo_1D
+  public time_evo_2D
 !  private runge_kutta_4
   private dx2
-
+  private dy2
 contains
 
-subroutine time_evo(N,meth,psi,pot,t,timestep)
+subroutine time_evo_1D(N,meth,psi,pot,dt)
 integer, intent(in) :: meth, N
 complex(8), intent(inout) :: psi(N)
 real(8), intent(in) :: pot(N)
-real(8), intent(in) :: t, timestep
-complex(8) :: psi_p(N)
- if (meth == 1) then
-!!$    call runge_kutta_4(N,psi,pot,t,timestep)
-!!$ else 
-    call dx2(N,psi,psi_p)
-    psi(:) = timestep*(dcmplx(0.0,1.0)*psi_p(:)+pot(:)) + psi(:)
- end if
-end subroutine time_evo
+real(8), intent(in) :: dt
+complex(8) :: psi_p(N), k1(N), k2(N), k3(N), k4(N)
 
-!!$subroutine runge_kutta_4(N,psi,pot,t,timestep)
+
+ if (meth == 1) then
+    call dx2(N,psi,psi_p)
+    psi(:) = dt*(-psi_p(:)+pot(:)*psi(:))/dcmplx(0,1) + psi(:)
+ else 
+    call dx2(N,psi,k1)
+    call dx2(N,psi+k1*dt/2,k2)
+    call dx2(N,psi+k2*dt/2,k3)
+    call dx2(N,psi+k3*dt,k4)
+    psi(:) = dt*(-(k1+2*k2+2*k3+k4)/6+pot(:)*psi(:))/dcmplx(0,1) + psi(:)
+ end if
+end subroutine time_evo_1D
+
+subroutine time_evo_2D(N,meth,psi,pot,dt)
+integer, intent(in) :: meth, N
+complex(8), intent(inout) :: psi(N,N)
+real(8), intent(in) :: pot(N,N)
+real(8), intent(in) :: dt
+complex(8) :: psi_px(N,N), psi_py(N,N)
+complex(8) :: kx1(N,N), kx2(N,N), kx3(N,N), kx4(N,N)
+complex(8) :: ky1(N,N), ky2(N,N), ky3(N,N), ky4(N,N)
+ if (meth == 1) then
+    call dx2(N,psi,psi_px)
+    call dy2(N,psi,psi_py)
+    psi(:,:) = dt*(-(psi_px(:,:)+psi_py(:,:))+pot(:,:)*psi(:,:))/dcmplx(0,1) + psi(:,:)
+ else 
+    call dx2(N,psi,kx1)
+    call dx2(N,psi+kx1*dt/2,kx2)
+    call dx2(N,psi+kx2*dt/2,kx3)
+    call dx2(N,psi+kx3*dt,kx4)
+    call dy2(N,psi,ky1)
+    call dy2(N,psi+ky1*dt/2,ky2)
+    call dy2(N,psi+ky2*dt/2,ky3)
+    call dy2(N,psi+ky3*dt,ky4) 
+    psi(:,:) = dt*(-(((kx1+2*kx2+2*kx3+kx4)/6)+((ky1+2*ky2+2*ky3+ky4)/6))+pot(:,:)*psi(:,:))/dcmplx(0,1) + psi(:,:)
+ end if
+end subroutine time_evo_2D
+
+!!$subroutine runge_kutta_4(N,psi,pot,dt)
 !!$integer, intent(in) :: N
-!!$real(8), intent(inout) :: psi(N)
-!!$real(8), intent(in) :: t, timestep, pot(N)
-!!$real(8) :: k1(N), k2(N), k3(N), k4(N)
+!!$complex(8), intent(inout) :: psi(N)
+!!$real(8), intent(in) :: dt, pot(N)
+!!$complex(8) :: k1(N), k2(N), k3(N), k4(N)
 !!$
 !!$call dx2(N,psi,k1)
-!!$write(*,*) 'k1 =' k1
-!!$call dx2(N,psi+k1*timestep/2,k2)
-!!$write(*,*) 'k2 =' k2
-!!$call dx2(N,psi+k2*timestep/2,k3)!!$write(*,*) 'k3 =' k3
-!!$call dx2(N,psi+k3*timestep,k4)
-!!$write(*,*) 'k4 =' k4
-!!$
+!!$call dx2(N,psi+k1*dt/2,k2)
+!!$call dx2(N,psi+k2*dt/2,k3)
+!!$call dx2(N,psi+k3*dt,k4)
+!!$psi(:) = dt*(-(k1+2*k2+2*k3+k4)/6+pot(:)*psi(:))/dcmplx(0,1) + psi(:)
 !!$end subroutine runge_kutta_4
 
 subroutine dx2(N,psi,psi_p)
-integer, intent(in) :: N
-complex(8), intent(in) :: psi(N)
-complex(8), intent(out) :: psi_p(N)
-integer :: i
+  integer, intent(in) :: N
+  complex(8), intent(in) :: psi(N)
+  complex(8), intent(out) :: psi_p(N)
+  integer :: i
 
-psi_p(1) = psi(2) - 2*psi(1) + psi(N)
-psi_p(N) = psi(1) - 2*psi(1) + psi(N-1)
-do i = 2, N-1
-   psi_p(i) = psi(i+1) - 2*psi(i) + psi(i-1)
-end do
+  psi_p(1) = -(psi(2) - 2*psi(1) + psi(N))
+  psi_p(N) = 0 ! psi(1) - 2*psi(1) + psi(N-1)
+  do i = 2, N-1
+     psi_p(i) = psi(i+1) - 2*psi(i) + psi(i-1)
+  end do
 
 end subroutine dx2
+
+subroutine dy2(N,psi,psi_p)
+  integer, intent(in) :: N
+  complex(8), intent(in) :: psi(N,N)
+  complex(8), intent(out) :: psi_p(N,N)
+  integer :: i,x
+
+  do x = 1, N
+     psi_p(x,1) = -(psi(x,2) - 2*psi(x,1) + psi(x,N))
+     psi_p(x,N) = 0 ! psi(1) - 2*psi(1) + psi(N-1)
+     do i = 2, N-1
+        psi_p(x,i) = psi(x,i+1) - 2*psi(x,i) + psi(x,i-1)
+     end do
+  end do
+
+end subroutine dy2
 
 end module time_evolution

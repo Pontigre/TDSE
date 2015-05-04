@@ -14,7 +14,7 @@ module plot
 contains 
   subroutine plot_init(N)
     integer, intent(in) :: n
-    real(8) :: xmax
+    real(8) :: xmin, xmax
     call plscol0(0, 255, 255, 255) ! white
     call plscol0(1, 255, 0, 0) ! red
     call plscol0(2, 0, 255, 0) ! green
@@ -23,9 +23,10 @@ contains
 
     call plsdev("xcairo")
     call plinit()
-    xmax = N-1
+    xmin = 45
+    xmax = 90
     call plcol0(7)
-    call plenv(0d0, xmax, 0d0, 2d0, 0, 0)
+    call plenv(xmin, xmax, 0d0, 2d0, 0, 0)
   end subroutine plot_init
 
   subroutine plot_init_2D(N)

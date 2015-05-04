@@ -9,7 +9,7 @@ program TDSE
 
   integer :: sys=1
   integer :: meth=2 
-  integer, parameter :: N=75
+  integer, parameter :: N=300!N=75
   complex(8) :: psi(N), psi2(N,N)
   real(8) :: pot(N), pot2(N,N)
   real(8) :: t, dt=0.02, t_final=30d0, t_init=0d0

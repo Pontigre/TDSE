@@ -77,29 +77,27 @@ contains
 end subroutine plot_1D
 
 subroutine plot_2D(N,psi)
-integer, intent(in) :: N
-complex(8), intent(in) :: psi(N,N)
-real(8) :: size, xmin, xmax, ymin, ymax, zmin, zmax, rpsi(N,N)
-size = N
-xmin = 20
-xmax = 90
-ymin = 20
-ymax = 90
-zmin = 0d0
-zmax = 2d0
-rpsi(:,:) = CDABS(psi(:,:))**2
+  integer, intent(in) :: N
+  complex(8), intent(in) :: psi(N,N)
+  real(8) :: size, xmin, xmax, ymin, ymax, zmin, zmax, rpsi(N,N)
 
-!call plclear()
-!call plimage(idata, xmin, xmax, ymin, ymax, zmin, zmax, Dxmin, Dxmax, Dymin, Dymax)
-call plimage(rpsi, xmin, xmax, ymin, ymax, 0d0, 2d0, xmin, xmax, ymin, ymax)
-call plflush()
+  size = N
+  xmin = 20
+  xmax = 90
+  ymin = 20
+  ymax = 90
+  zmin = 0d0
+  zmax = 2d0
+  rpsi(:,:) = CDABS(psi(:,:))**2
+  call plimage(rpsi, 1d0, size, 1d0, size, -1d0, 5d0, xmin, xmax, ymin, ymax)
+  call plflush()
 
 end subroutine plot_2D
 
 
 subroutine plot_close()
 
-  call plspause(.false.)
+ ! call plspause(.false.)
   call plend()
 
 end subroutine plot_close

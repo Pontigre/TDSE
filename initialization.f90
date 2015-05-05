@@ -42,7 +42,8 @@ contains
     bar_x_min = 47
     bar_x_max = 53
 
-    pot(:) = 0
+    pot(:) = 0d0
+
 
     if (flag == 1) then !barrier
        do x = bar_x_min, bar_x_max
@@ -54,23 +55,23 @@ contains
        end do
     else if (flag == 3) then !single slit
        do x = bar_x_min, bar_x_max
-          do y = 1, 47
-             pot2(x,y) = 10d0
+          do y = 1, 45
+             pot2(x,y) = -2d0
           end do
-          do y = 53, N
-             pot2(x,y) = 10d0
+          do y = 55, N
+             pot2(x,y) = -2d0
           end do
        end do
     else if (flag == 4) then !double slit
        do x = bar_x_min, bar_x_max
-          do y = 1, 45
-             pot2(x,y) = 10d0
+          do y = 1, 48
+             pot2(x,y) = -2d0
           end do
-          do y = 47, 53
-             pot2(x,y) = 10d0
+          do y = 50,51 
+             pot2(x,y) = -2d0
           end do
-          do y = 55, N
-             pot2(x,y) = 10d0
+          do y = 53, N
+             pot2(x,y) = -2d0
           end do
        end do
     end if

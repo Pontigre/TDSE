@@ -4,7 +4,6 @@ module time_evolution
 
   public time_evo_1D
   public time_evo_2D
-!  private runge_kutta_4
   private dx2
   private dy2
 contains
@@ -53,19 +52,6 @@ complex(8) :: ky1(N,N), ky2(N,N), ky3(N,N), ky4(N,N)
     psi(:,:) = dt*(-(((kx1+2*kx2+2*kx3+kx4)/6)+((ky1+2*ky2+2*ky3+ky4)/6))+pot(:,:)*psi(:,:))/dcmplx(0,1) + psi(:,:)
  end if
 end subroutine time_evo_2D
-
-!!$subroutine runge_kutta_4(N,psi,pot,dt)
-!!$integer, intent(in) :: N
-!!$complex(8), intent(inout) :: psi(N)
-!!$real(8), intent(in) :: dt, pot(N)
-!!$complex(8) :: k1(N), k2(N), k3(N), k4(N)
-!!$
-!!$call dx2(N,psi,k1)
-!!$call dx2(N,psi+k1*dt/2,k2)
-!!$call dx2(N,psi+k2*dt/2,k3)
-!!$call dx2(N,psi+k3*dt,k4)
-!!$psi(:) = dt*(-(k1+2*k2+2*k3+k4)/6+pot(:)*psi(:))/dcmplx(0,1) + psi(:)
-!!$end subroutine runge_kutta_4
 
 subroutine dx2(N,psi,psi_p)
   integer, intent(in) :: N
